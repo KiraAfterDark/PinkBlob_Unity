@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c364b80cbb904a44ad925591ad19e84, type: 3}
+  m_Name: ABL_Default_Fire_PROP
+  m_EditorClassIdentifier: 
+  nameKey: ability_name_fire
+  material: {fileID: 2100000, guid: b0922950eb8f61b4ca220bd5debe674f, type: 2}
+  damage: 2
+  flamethrowerDistance: 2
+  flamethrowerWidth: 0.5
+  flamethrowerRotationSpeedMod: 0.25
+  flamethrowerAccelMod: 0.25
+  flamethrowerMask:
+    serializedVersion: 2
+    m_Bits: 8448
+  flamethrowerTime: 0.5
+  flamethrowerFx: {fileID: 1446329555461750137, guid: a269ca7cf14012b44976c9e53d75a3ba, type: 3}

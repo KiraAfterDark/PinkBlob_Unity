@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="ability_container" style="width: 342px; height: 362px; position: absolute; top: 692px; left: 1546px;">
+        <ui:IMGUIContainer name="background" style="position: absolute; width: 100%; height: 100%; background-color: rgba(70, 65, 51, 0.57);" />
+        <ui:IMGUIContainer name="ability_image" style="height: 90%; margin-left: 10px; margin-right: 10px; margin-top: 10px; margin-bottom: 10px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0;" />
+        <ui:Label text="[AbilityName]" display-tooltip-when-elided="true" name="ability_name" style="-unity-text-align: middle-center; height: 10%; margin-left: 10px; margin-right: 10px; margin-top: 10px; margin-bottom: 10px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; font-size: 36px;" />
+    </ui:VisualElement>
+</ui:UXML>
