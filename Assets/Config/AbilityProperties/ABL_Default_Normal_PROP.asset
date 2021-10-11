@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c2ecfdec33c6774493fbdc36cf0a530, type: 3}
+  m_Name: ABL_Default_Normal_PROP
+  m_EditorClassIdentifier: Assembly-CSharp:PinkBlob.Gameplay.Ability:NormalAbilityProperties
+  nameKey: ability_name_normal
+  material: {fileID: 2100000, guid: 9a31a297e1a3d7f40bcf74792f908479, type: 2}
+  suckDistance: 2
+  suckWidth: 0.5
+  suckRotationSpeedMod: 0.25
+  suckAccelMod: 0.25
+  suckMask:
+    serializedVersion: 2
+    m_Bits: 9472
+  suckTime: 0.5
+  suckFx: {fileID: 2436199281317572666, guid: 94434cf89300db048bf34119cb894c3e, type: 3}
+  inhaledRotationSpeedMod: 0.25
+  inhaledAccelMod: 0.25
