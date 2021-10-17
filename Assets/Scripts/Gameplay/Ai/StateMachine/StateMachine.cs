@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PinkBlob
+namespace PinkBlob.Gameplay.Ai.StateMachine
 {
     public abstract class StateMachine : MonoBehaviour
     {
+        public IState CurrentState => currentState;
         private IState currentState;
 
+        public List<Transition> Transitions => transitions;
         private readonly List<Transition> transitions = new List<Transition>();
 
         private void Awake()
@@ -44,7 +46,6 @@ namespace PinkBlob
 
         protected void SetState(IState state)
         {
-            Debug.Log($"Transition From {currentState?.StateName()} To {state.StateName()}");
             currentState?.ExitState();
             currentState = state;
             currentState?.EnterState();
@@ -58,5 +59,7 @@ namespace PinkBlob
 
             return transition;
         }
+
+        public abstract void PrintDebug();
     }
 }

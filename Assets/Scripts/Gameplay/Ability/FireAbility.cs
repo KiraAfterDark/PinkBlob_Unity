@@ -13,9 +13,6 @@ namespace PinkBlob.Gameplay.Ability
 
         private FireAbilityProperties FireProperties => Properties as FireAbilityProperties;
 
-        private readonly Collider[] flamethrowerOverlap = new Collider[20];
-        private int flamethrowerOverlapSize = 0;
-
         public override float RotationSpeedMod
         {
             get
@@ -45,14 +42,12 @@ namespace PinkBlob.Gameplay.Ability
         private readonly GameObject flamethrowerFx;
 
         private float timer = 0;
-
-        public override Material Material => FireProperties.Material;
-
-        public FireAbility(PlayerController playerController) : base(playerController)
+        
+        public FireAbility(PlayerController player, Animator animator) : base(player, animator)
         {
             Properties = GameplayController.Instance.AbilityPropertyGroup.FireAbilityProperties;
             
-            flamethrowerFx = Object.Instantiate(FireProperties.FlamethrowerFx, playerController.SuckLocation);
+            flamethrowerFx = Object.Instantiate(FireProperties.FlamethrowerFx, player.SuckLocation);
             flamethrowerFx.SetActive(false);
 
             timer = 0;
@@ -73,8 +68,8 @@ namespace PinkBlob.Gameplay.Ability
                 {
                     timer = FireProperties.FlamethrowerTime;
 
-                    Transform transform = PlayerController.transform;
-                    Vector3 origin = PlayerController.SuckLocation.position;
+                    Transform transform = Player.transform;
+                    Vector3 origin = Player.SuckLocation.position;
 
                     if (Physics.SphereCast(origin, FireProperties.FlamethrowerWidth, transform.forward, out RaycastHit hit,
                                            FireProperties.FlamethrowerDistance, FireProperties.FlamethrowerMask))
@@ -109,10 +104,9 @@ namespace PinkBlob.Gameplay.Ability
 
         public override void PrintDebugWindow()
         {
+            base.PrintDebugWindow();
+            GUILayout.Space(5);
             GUILayout.Label("Fire Ability", EditorStyles.boldLabel);
-            GUILayout.Label($"Input Lock: {MovementInputLock}");
-            GUILayout.Label($"Accel Mod: {MaxInputSpeedMod}");
-            GUILayout.Label($"Rotation Speed Mod: {RotationSpeedMod}");
 
             if (GUILayout.Button("Toggle Flamethrower"))
             {
@@ -135,8 +129,8 @@ namespace PinkBlob.Gameplay.Ability
             {
                 Gizmos.color = Color.red;
 
-                Vector3 origin = PlayerController.SuckLocation.position;
-                Transform transform = PlayerController.transform;
+                Vector3 origin = Player.SuckLocation.position;
+                Transform transform = Player.transform;
 
                 Vector3 forward = transform.forward;
                 Vector3 up = transform.up;

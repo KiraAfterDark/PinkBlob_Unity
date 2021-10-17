@@ -8,5 +8,6 @@ namespace PinkBlob.Gameplay.Ability
         
         Fire,
         Sword,
+        Cutter,
     }
 }

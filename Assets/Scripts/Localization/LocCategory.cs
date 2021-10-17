@@ -12,7 +12,19 @@ namespace PinkBlob.Localization
 
         public string GetEntry(string stringKey, LanguageCode languageCode)
         {
-            return entries[stringKey][languageCode];
+            if (entries.ContainsKey(stringKey))
+            {
+                if (entries[stringKey].ContainsKey(languageCode))
+                {
+                    return entries[stringKey][languageCode];
+                }
+                
+                Debug.LogWarning($"String Key {stringKey} is missing language {languageCode}.", this);
+                return stringKey;
+            }
+            
+            Debug.LogWarning($"String Key {stringKey} is missing in LocCategory {name}.", this);
+            return stringKey;
         }
     }
 }

@@ -1,18 +1,26 @@
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace PinkBlob.Gameplay.Ability.Properties
 {
     [CreateAssetMenu(fileName = "New Ability Property Group", menuName = "Ability/Ability Property Group", order = 0)]
-    public class AbilityPropertyGroup : ScriptableObject
+    public class AbilityPropertyGroup : SerializedScriptableObject
     {
-        [SerializeField]
-        private NormalAbilityProperties normalAbilityProperties = default;
+        public AbilityPropertyGroup(NormalAbilityProperties normalAbilityProperties, FireAbilityProperties fireAbilityProperties,
+                                    CutterAbilityProperties cutterAbilityProperties)
+        {
+            NormalAbilityProperties = normalAbilityProperties;
+            FireAbilityProperties = fireAbilityProperties;
+            CutterAbilityProperties = cutterAbilityProperties;
+        }
 
-        public NormalAbilityProperties NormalAbilityProperties => normalAbilityProperties;
+        [SerializeField]
+        public NormalAbilityProperties NormalAbilityProperties { get; private set; }
         
         [SerializeField]
-        private FireAbilityProperties fireAbilityProperties = default;
+        public FireAbilityProperties FireAbilityProperties { get; private set; }
 
-        public FireAbilityProperties FireAbilityProperties => fireAbilityProperties;
+        [SerializeField]
+        public CutterAbilityProperties CutterAbilityProperties { get; private set; }
     }
 }

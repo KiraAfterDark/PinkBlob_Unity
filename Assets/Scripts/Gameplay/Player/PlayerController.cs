@@ -2,17 +2,21 @@ using System;
 using System.Collections;
 using Cinemachine;
 using PinkBlob.Gameplay.Ability;
+using PinkBlob.Gameplay.Enemy;
 using PinkBlob.Input;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
 namespace PinkBlob.Gameplay.Player
 {
     [RequireComponent(typeof(CharacterController))]
-    public class PlayerController : MonoBehaviour
+    public class PlayerController : MonoBehaviour, ISeeable
     {
+        public const string Tag = "Player";
+        
         public event Action OnNewAbility;
         
         // Required Components
@@ -46,7 +50,7 @@ namespace PinkBlob.Gameplay.Player
         public Vector3 Velocity => velocity;
         private Vector3 velocity;
         
-        [Title("Movement")]
+        [Title("Speed")]
         
         [Min(0)]
         [SerializeField]
@@ -55,7 +59,7 @@ namespace PinkBlob.Gameplay.Player
         [Min(0)]
         [SerializeField]
         private float maxCrouchInputSpeed = 2f;
-
+        
         [Min(0)]
         [SerializeField]
         private float maxFlyInputSpeed = 3f;
@@ -80,6 +84,8 @@ namespace PinkBlob.Gameplay.Player
 
         [SerializeField]
         private float minSpeed = 0.1f;
+        
+        [Title("Acceleration")]
 
         [Min(0)] 
         [SerializeField]
@@ -101,10 +107,7 @@ namespace PinkBlob.Gameplay.Player
 
         public float Decel => !isGrounded ? airDecel : groundDecel;
 
-        // Jumping + Flying
-        
-        public bool IsFlying => isFlying;
-        private bool isFlying = false;
+        // Jump
         
         [Title("Jump")]
         
@@ -112,17 +115,40 @@ namespace PinkBlob.Gameplay.Player
         [SerializeField]
         private float jumpSpeed = 100f;
 
-        [Min(0)]
-        [SerializeField]
-        private int numberOfJumps = 5;
-        
-        public int RemainingJumps => numberOfJumps - jumps;
-        private int jumps = 0;
-
         [Tooltip("Jumps don't happen if vertical speed is above this.")]
         [Min(0)]
         [SerializeField]
-        private float maxJumpSpeed = 5f;
+        private float maxJumpSpeed = 5f; 
+        
+        //Fly
+
+        public bool IsFlying => isFlying;
+        private bool isFlying = false;
+
+        [Title("Fly")]
+        
+        [Min(0)]
+        [SerializeField]
+        private float flapSpeed = 3;
+        
+        [Range(0, 1)]
+        [SerializeField]
+        private float flyGravityMod = 0.7f;
+        
+        [FormerlySerializedAs("numberOfJumps")]
+        [Min(0)]
+        [SerializeField]
+        private int numberOfFlaps = 3;
+        
+        private int flaps = 0;
+        
+        public int RemainingFlaps => numberOfFlaps - flaps;
+
+        [Min(0)]
+        [SerializeField]
+        private float flapCooldown = 0.1f;
+        
+        private bool canFlap = true;
 
         public bool IsCrouched => isCrouched;
         private bool isCrouched = false;
@@ -147,6 +173,14 @@ namespace PinkBlob.Gameplay.Player
         [Min(0)]
         [SerializeField]
         private float slideTimer = 2f;
+
+        [Min(0)]
+        [SerializeField]
+        private int slideDamage = 2;
+
+        [Required]
+        [SerializeField]
+        private GameObject slideTrigger;
 
         [Title("Colliders")]
 
@@ -192,6 +226,18 @@ namespace PinkBlob.Gameplay.Player
 
         public Transform SuckLocation => suckLocation;
 
+        [Required]
+        [SerializeField]
+        private Transform rangeOrigin;
+        
+        public Transform RangeOrigin => rangeOrigin;
+
+        [Required]
+        [SerializeField]
+        private Transform seePosition;
+
+        public Vector3 GetSeePosition() => seePosition.position;
+
         // Ability
         private PlayerAbility ability;
         
@@ -208,6 +254,9 @@ namespace PinkBlob.Gameplay.Player
 
         [SerializeField]
         private string flyParam = "Fly";
+        
+        [SerializeField]
+        private string exhaleParam = "Exhale";
 
         #region Unity Events
         
@@ -220,6 +269,8 @@ namespace PinkBlob.Gameplay.Player
             
             characterController.detectCollisions = true;
             
+            slideTrigger.SetActive(false);
+            
             InitInput();
         }
 
@@ -227,8 +278,8 @@ namespace PinkBlob.Gameplay.Player
         {
             camera = Camera.main;
 
-            jumps = 0;
-            ability = this.GetAbility(defaultAbility);
+            flaps = 0;
+            SetAbility(defaultAbility);
         }
 
         private void OnEnable()
@@ -273,6 +324,10 @@ namespace PinkBlob.Gameplay.Player
                                                        {
                                                            StartSlide();
                                                        }
+                                                       else if (isFlying)
+                                                       {
+                                                           Exhale();
+                                                       }
                                                        else
                                                        {
                                                            ability?.OnStartAction();
@@ -281,7 +336,7 @@ namespace PinkBlob.Gameplay.Player
             
             playerInput.Gameplay.Action.canceled += ctx =>
                                                     {
-                                                        if (!isCrouched)
+                                                        if (!isCrouched && !isFlying)
                                                         {
                                                             ability?.OnCancelAction();
                                                         }
@@ -289,7 +344,7 @@ namespace PinkBlob.Gameplay.Player
             
             playerInput.Gameplay.Action.performed += ctx =>
                                                      {
-                                                         if (!isCrouched)
+                                                         if (!isCrouched && !isFlying)
                                                          {
                                                              ability?.OnPerformedAction();
                                                          }
@@ -397,23 +452,52 @@ namespace PinkBlob.Gameplay.Player
 
         private void Jump()
         {
-            if (jumps < numberOfJumps && velocity.y < maxJumpSpeed && (isGrounded || !ability.FlyingLock) && !isCrouched)
+            if (!isGrounded && !isFlying)
+            {
+                SwitchToFlying();
+            }
+
+            if (CanFlap())
+            {
+                DoFlap();
+            }
+
+            if (isGrounded && !isCrouched)
             {
                 velocity += jumpSpeed * Vector3.up;
-                jumps++;
-
-                if (!isGrounded)
-                {
-                    SwitchToFlying();
-                }
             }
+        }
+
+        private bool CanFlap()
+        {
+            if (!canFlap)
+            {
+                return false;
+            }
+            
+            return isFlying && flaps < numberOfFlaps && velocity.y < maxJumpSpeed && (isGrounded || !ability.FlyingLock);
+        }
+
+        private IEnumerator FlapCooldown()
+        {
+            canFlap = false;
+            yield return new WaitForSeconds(flapCooldown);
+            canFlap = true;
+        }
+
+        private void DoFlap()
+        {
+            flaps++;
+            
+            velocity += flapSpeed * Vector3.up;
+            StartCoroutine(FlapCooldown());
         }
 
         private void UpdateGravity()
         {
             if (!isGrounded)
             {
-                velocity += PinkBlobPhysics.Gravity * Time.deltaTime * Vector3.up;
+                velocity += PinkBlobPhysics.Gravity * GetGravityMod() * Time.deltaTime * Vector3.up;
             }
         }
 
@@ -439,6 +523,8 @@ namespace PinkBlob.Gameplay.Player
         private void SwitchToFlying()
         {
             isFlying = true;
+
+            animator.SetBool(flyParam, true);
             
             flyCollider.enabled = true;
             characterController.detectCollisions = false;
@@ -450,7 +536,9 @@ namespace PinkBlob.Gameplay.Player
             isFlying = false;
             
             velocity.y = 0;
-            jumps = 0;
+            flaps = 0;
+            
+            animator.SetBool(flyParam, false);
             
             flyCollider.enabled = false;
             characterController.detectCollisions = true;
@@ -493,7 +581,7 @@ namespace PinkBlob.Gameplay.Player
 
         public void SetAbility(AbilityType abilityType)
         {
-            ability = this.GetAbility(abilityType);
+            ability = this.GetAbility(animator, abilityType);
             renderer.material = ability.Material;
             
             OnNewAbility?.Invoke();
@@ -519,10 +607,12 @@ namespace PinkBlob.Gameplay.Player
             isSlide = true;
             Vector3 slideVelocity = transform.forward * slideSpeed;
             velocity = slideVelocity;
+            slideTrigger.SetActive(true);
             
             yield return new WaitForSeconds(slideTimer);
 
             isSlide = false;
+            slideTrigger.SetActive(false);
             if (!playerInput.Gameplay.Crouch.inProgress)
             {
                 isCrouched = false;
@@ -532,6 +622,36 @@ namespace PinkBlob.Gameplay.Player
                 crouchCollider.enabled = false;
 
                 animator.SetBool(crouchParam, false);
+            }
+        }
+
+        private void Exhale()
+        {
+            animator.SetTrigger(exhaleParam);
+            animator.SetBool(flyParam, false);
+            isFlying = false;
+        }
+
+        private float GetGravityMod()
+        {
+            return isFlying ? flyGravityMod : 1f;
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            Debug.Log("Trigger");
+            
+            if (isSlide)
+            {
+                OnSlideTriggerEnter(other);
+            }
+        }
+
+        private void OnSlideTriggerEnter(Collider other)
+        {
+            if (other.TryGetComponent(out Health health))
+            {
+                health.DealDamage(slideDamage);
             }
         }
 

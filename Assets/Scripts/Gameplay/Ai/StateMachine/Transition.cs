@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,7 +12,8 @@ namespace PinkBlob
         
         public bool Interrupt { get; private set; }
 
-        private bool extraCheck = true;
+        public List<Func<bool>> ExtraCheck => extraChecks;
+        private readonly List<Func<bool>> extraChecks = new List<Func<bool>>();
 
         public Transition From(IState state)
         {
@@ -25,9 +27,9 @@ namespace PinkBlob
             return this;
         }
 
-        public Transition When(bool check)
+        public Transition When(Func<bool> check)
         {
-            extraCheck &= check;
+            extraChecks.Add(check);
             return this;
         }
 
@@ -39,7 +41,20 @@ namespace PinkBlob
 
         public bool CanTransition()
         {
-            return FromState.CanTransitionOut() && ToState.CanTransitionIn() && extraCheck && CheckSelfTransition();
+            return FromState.CanTransitionOut() && ToState.CanTransitionIn() && ExtraChecks() && CheckSelfTransition();
+        }
+
+        public bool ExtraChecks()
+        {
+            foreach (Func<bool> extraCheck in extraChecks)
+            {
+                if (!extraCheck.Invoke())
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private bool CheckSelfTransition()

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using UnityEditor;
 using UnityEngine;
 
 namespace PinkBlob
@@ -49,6 +50,8 @@ namespace PinkBlob
         public virtual bool CanTransitionOut() => true;
 
         public virtual bool CanTransitionToSelf() => false;
+
+        public abstract void PrintDebug();
 
         protected void SetSubState(int subStateId)
         {

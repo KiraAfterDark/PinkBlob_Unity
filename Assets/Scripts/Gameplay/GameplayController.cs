@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using PinkBlob.Gameplay.Ability.Properties;
+using PinkBlob.Gameplay.Enemy;
 using PinkBlob.Gameplay.Player;
 using PinkBlob.Ui.GameplayHud;
 using Sirenix.OdinInspector;
@@ -50,6 +52,10 @@ namespace PinkBlob.Gameplay
 		[SceneObjectsOnly]
 		[SerializeField]
 		private AbilityHud abilityHud;
+		
+		// Enemies
+		public List<EnemyController> Enemies => enemies;
+		private List<EnemyController> enemies = new List<EnemyController>();
 
 		private void Awake()
 		{
@@ -78,6 +84,11 @@ namespace PinkBlob.Gameplay
 
 			PlayerController = Instantiate(playerControllerPrefab, Vector3.zero, Quaternion.identity);
 			abilityHud.Init(PlayerController);
+		}
+
+		public void SpawnEnemy(EnemyController enemy)
+		{
+			enemies.Add(enemy);
 		}
 	}
 }

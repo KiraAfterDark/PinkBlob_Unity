@@ -1,6 +1,7 @@
 using PinkBlob.Gameplay.Ability.Properties;
 using PinkBlob.Gameplay.Player;
 using Sirenix.OdinInspector;
+using UnityEditor;
 using UnityEngine;
 
 namespace PinkBlob.Gameplay.Ability
@@ -14,15 +15,20 @@ namespace PinkBlob.Gameplay.Ability
 
         public virtual float MaxInputSpeedMod => 1f;
 
-        protected readonly PlayerController PlayerController;
+        protected readonly PlayerController Player;
 
-        public abstract Material Material { get; }
+        protected readonly Animator Animator;
+
+        public Material Material => Properties.Material;
 
         public AbilityProperties Properties { get; protected set; }
 
-        protected PlayerAbility(PlayerController playerController)
+        protected PlayerAbility(PlayerController player, Animator animator)
         {
-            PlayerController = playerController;
+            Player = player;
+            Animator = animator;
+            
+            
         }
 
         protected abstract void ExitAbility();
@@ -41,6 +47,12 @@ namespace PinkBlob.Gameplay.Ability
 
         public virtual void OnDrawGizmos() { }
 
-        public abstract void PrintDebugWindow();
+        public virtual void PrintDebugWindow()
+        {
+            GUILayout.Label("Ability", EditorStyles.boldLabel);
+            GUILayout.Label($"Input Lock: {MovementInputLock}");
+            GUILayout.Label($"Accel Mod: {MaxInputSpeedMod}");
+            GUILayout.Label($"Rotation Speed Mod: {RotationSpeedMod}");
+        }
     }
 }

@@ -1,24 +1,40 @@
+using System;
 using System.Collections.Generic;
+using Pathfinding;
 using Sirenix.OdinInspector;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
-namespace PinkBlob
+namespace PinkBlob.Gameplay.Ai.StateMachine.States.MoveStates
 {
+    [RequireComponent(typeof(Seeker))]
+    [RequireComponent(typeof(CharacterController))]
     public class WanderMoveState : MoveState
     {
         public override string StateName() => "Wander Move State";
 
+        private enum WanderPosition
+        {
+            Origin,
+            Self
+        }
+
         [Title("Wander Properties")]
 
         [SerializeField]
-        private AgentType agentType;
-        
-        private NavMeshAgent agent;
+        private WanderPosition wanderPosition = WanderPosition.Origin;
 
+        private Vector3 wanderAround;
+        
         [Min(0)]
         [SerializeField]
         private float wanderRadius = 2f;
+
+        [Min(0)]
+        [SerializeField]
+        private float minimumWanderDistance = 1f;
 
         [Min(0)]
         [SerializeField]
@@ -39,16 +55,26 @@ namespace PinkBlob
         public override bool CanTransitionToSelf() => canTransitionToSelf;
 
         private bool canTransitionToSelf = false;
+        
+        // navigation
+        private Seeker seeker;
+        private Path path;
+        private bool reachedEndOfPath;
+        private CharacterController characterController;
+        private int currentWaypoint = 0;
+        private float distanceToWaypoint;
+        private bool hasPath = false;
+        
+        private Vector3 startPosition;
+        
 
         private void Awake()
         {
-            if (!TryGetComponent(out agent))
-            {
-                agent = gameObject.AddComponent<NavMeshAgent>();
-            }
+            seeker = GetComponent<Seeker>();
+            characterController = GetComponent<CharacterController>();
 
-            agent.agentTypeID = AgentUtil.AgentTypeToId(agentType);
-
+            startPosition = transform.position;
+            
             SetupSubStateMap();
         }
 
@@ -60,15 +86,26 @@ namespace PinkBlob
                                 SubStateValues.Start, new SubState
                                                       {
                                                           Id = SubStateValues.Start,
+                                                          Name = "Start",
                                                           
                                                           Enter = EnterStart,
                                                           Update = UpdateStart
                                                       }
                             },
                             {
+                                SubStateValues.Pathing, new SubState
+                                                      {
+                                                          Id = SubStateValues.Pathing,
+                                                          Name = "Pathing",
+                                                          
+                                                          Enter = EnterPathing,
+                                                      }
+                            },
+                            {
                                 SubStateValues.Wander, new SubState
                                                        {
                                                            Id = SubStateValues.Wander,
+                                                           Name = "Wander",
                                                            
                                                            Enter = EnterWander,
                                                            Update = UpdateWander
@@ -78,6 +115,7 @@ namespace PinkBlob
                                 SubStateValues.Cooldown, new SubState
                                                        {
                                                            Id = SubStateValues.Cooldown,
+                                                           Name = "Cooldown",
                                                            
                                                            Enter = EnterCooldown,
                                                            Update = UpdateCooldown
@@ -87,6 +125,7 @@ namespace PinkBlob
                                 SubStateValues.Finish, new SubState
                                                        {
                                                            Id = SubStateValues.Finish,
+                                                           Name = "Finish",
                                                            
                                                            Enter = EnterFinish,
                                                        }
@@ -96,10 +135,6 @@ namespace PinkBlob
         
         protected override void EnterMove()
         {
-            agent.enabled = true;
-            agent.speed = movementSpeed;
-            agent.angularSpeed = rotationSpeed;
-
             canTransitionToSelf = false;
             
             SetSubState(SubStateValues.Start);
@@ -112,16 +147,26 @@ namespace PinkBlob
 
         protected override void ExitMove()
         {
-            agent.enabled = false;
+            
         }
         
         #region Start
 
         private void EnterStart()
         {
-            Debug.Log("Enter Start");
-            
             timer = startTime;
+
+            switch (wanderPosition)
+            {
+                case WanderPosition.Origin:
+                    wanderAround = startPosition;
+                    break;
+                case WanderPosition.Self:
+                    wanderAround = transform.position;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         private void UpdateStart()
@@ -130,6 +175,33 @@ namespace PinkBlob
 
             if (timer <= 0)
             {
+                SetSubState(SubStateValues.Pathing);
+            }
+        }
+        
+        #endregion
+        
+        #region Pathing
+
+        private void EnterPathing()
+        {
+            Vector2 wander = Random.insideUnitCircle * wanderRadius;
+            if (wander.magnitude < minimumWanderDistance)
+            {
+                wander = wander.normalized * minimumWanderDistance;
+            }
+            Vector3 pos = wanderAround + new Vector3(wander.x, 0, wander.y);
+
+            hasPath = false;
+            seeker.StartPath(transform.position, pos, OnPathCreated);
+        }
+
+        private void OnPathCreated(Path p)
+        {
+            if (!p.error)
+            {
+                path = p;
+                hasPath = true;
                 SetSubState(SubStateValues.Wander);
             }
         }
@@ -140,28 +212,46 @@ namespace PinkBlob
 
         private void EnterWander()
         {
-            Debug.Log("Enter Wander");
-            
-            Vector2 wander = Random.insideUnitCircle * wanderRadius;
-            Vector3 pos = transform.position + new Vector3(wander.x, 0, wander.y);
-
-            if (!NavMesh.SamplePosition(pos, out NavMeshHit hit, wanderRadius, NavMesh.AllAreas))
-            {
-                pos = hit.position;
-            }
-
-            Debug.Log(pos);
-
-            agent.SetDestination(pos);
-            agent.isStopped = false;
+            currentWaypoint = 0;
         }
 
         private void UpdateWander()
         {
-            if (agent.remainingDistance < reachDestinationDistance)
+            while (true)
             {
-                SetSubState(SubStateValues.Cooldown);
+                distanceToWaypoint = Vector3.Distance(transform.position, path.vectorPath[currentWaypoint]);
+                if (distanceToWaypoint < reachDestinationDistance) 
+                {
+                    if (currentWaypoint + 1 < path.vectorPath.Count) 
+                    {
+                        currentWaypoint++;
+                    } 
+                    else
+                    {
+                        SetSubState(SubStateValues.Cooldown);
+                        break;
+                    }
+                } 
+                else
+                {
+                    break;
+                }
             }
+            
+            Vector3 dir = (path.vectorPath[currentWaypoint] - transform.position).normalized;
+            Vector3 velocity = dir * movementSpeed;
+            characterController.SimpleMove(velocity);
+
+            UpdateRotation(velocity.normalized);
+        }
+        
+        private void UpdateRotation(Vector3 aimDirection)
+        {
+            Vector3 forward = aimDirection;
+            forward.y = 0;
+            forward.Normalize();
+
+            transform.forward = Vector3.RotateTowards(transform.forward, forward, rotationSpeed * Time.deltaTime, 0);
         }
         
         #endregion
@@ -202,9 +292,47 @@ namespace PinkBlob
         private static class SubStateValues
         {
             public const int Start = 0;
-            public const int Wander = 1;
-            public const int Cooldown = 2;
-            public const int Finish = 3;
+            public const int Pathing = 1;
+            public const int Wander = 2;
+            public const int Cooldown = 3;
+            public const int Finish = 4;
+        }
+
+        public override void PrintDebug()
+        {
+            EditorGUILayout.LabelField($"Current Sub State: {CurrentSubState.Name}");
+
+            if (hasPath)
+            {
+                EditorGUILayout.Space(5);
+
+                EditorGUILayout.LabelField($"Number of waypoints: {path.vectorPath.Count}");
+                EditorGUILayout.LabelField($"Current waypoint: {currentWaypoint}");
+                EditorGUILayout.LabelField($"Distance to waypoint: {distanceToWaypoint}");
+
+                EditorGUILayout.Space(5);
+
+                EditorGUILayout.LabelField($"Start Position: {path.vectorPath[0]}");
+                EditorGUILayout.LabelField($"End Position: {path.vectorPath[^1]}");
+
+                EditorGUILayout.LabelField($"Position: {transform.position}");
+                EditorGUILayout.LabelField($"Distance to end: {Vector3.Distance(transform.position, path.vectorPath[^1])}");
+            }
+        }
+
+        private void OnDrawGizmos()
+        {
+            Transform t = transform;
+            Vector3 position = t.position;
+            Vector3 origin = wanderPosition switch
+                             {
+                                 WanderPosition.Origin => Application.isPlaying ? startPosition : position,
+                                 WanderPosition.Self => position,
+                                 _ => throw new ArgumentOutOfRangeException()
+                             };
+
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireSphere(origin, wanderRadius);
         }
     }
 }

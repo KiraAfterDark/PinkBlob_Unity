@@ -43,7 +43,7 @@ namespace PinkBlob.Editor
                 
                 GUILayout.Space(5);
                 
-                GUILayout.Label($"Remaining Jumps: {GameplayController.Instance.PlayerController.RemainingJumps}");
+                GUILayout.Label($"Remaining Jumps: {GameplayController.Instance.PlayerController.RemainingFlaps}");
                 
                 EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
                 GameplayController.Instance.PlayerController.Ability.PrintDebugWindow();

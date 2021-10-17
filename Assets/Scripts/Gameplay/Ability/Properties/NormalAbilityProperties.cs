@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using PinkBlob.Gameplay.Player;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -37,16 +39,15 @@ namespace PinkBlob.Gameplay.Ability.Properties
 
         public LayerMask SuckMask => suckMask;
 
-        [Min(0)]
-        [SerializeField]
-        private float suckTime = 0.5f;
-
-        public float SuckTime => suckTime;
-
         [SerializeField]
         private GameObject suckFx = default;
 
         public GameObject SuckFx => suckFx;
+
+        [SerializeField]
+        private Dictionary<AbilityType, SuckObject> suckObjects;
+        
+        public Dictionary<AbilityType, SuckObject> SuckObjects => suckObjects;
         
         [Title("Inhaled")]
 
@@ -61,5 +62,15 @@ namespace PinkBlob.Gameplay.Ability.Properties
         private float inhaledAccelMod = 0.25f;
 
         public float InhaledAccelMod => inhaledAccelMod;
+
+        [SerializeField]
+        private string inhaledParam = "Inhaled";
+
+        public string InhaledParam => inhaledParam;
+
+        [SerializeField]
+        private string swallowedTrigger = "Swallowed";
+
+        public string SwallowedTrigger => swallowedTrigger;
     }
 }

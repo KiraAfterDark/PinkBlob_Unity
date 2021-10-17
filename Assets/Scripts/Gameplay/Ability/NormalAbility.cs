@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using PinkBlob.Gameplay.Ability.Properties;
 using PinkBlob.Gameplay.Player;
 using PinkBlob.Gameplay.Suck;
@@ -22,6 +23,8 @@ namespace PinkBlob.Gameplay.Ability
         private bool hasObject = false;
         private SuckObject suckObject;
         private SuckObjectProperties suckObjectProperties;
+
+        private readonly List<ISuckable> sucking = new List<ISuckable>();
 
         public override float RotationSpeedMod
         {
@@ -60,16 +63,14 @@ namespace PinkBlob.Gameplay.Ability
         }
         
         private readonly GameObject suckFx;
-
-        public override Material Material => NormalProperties.Material;
-
-        public NormalAbility(PlayerController playerController) : base(playerController)
+        
+        public NormalAbility(PlayerController player, Animator animator) : base(player, animator)
         {
             Properties = GameplayController.Instance.AbilityPropertyGroup.NormalAbilityProperties;
 
             camera = Camera.main;
 
-            suckFx = Object.Instantiate(NormalProperties.SuckFx, playerController.SuckLocation);
+            suckFx = Object.Instantiate(NormalProperties.SuckFx, player.SuckLocation);
             suckFx.SetActive(false);
         }
 
@@ -82,34 +83,72 @@ namespace PinkBlob.Gameplay.Ability
         {
             if (isSucking)
             {
-                Transform transform = PlayerController.transform;
-                Vector3 origin = PlayerController.SuckLocation.position;
-                Vector3 areaCenter = origin
-                                   + transform.forward * (NormalProperties.SuckDistance / 2f);
-                
-                suckOverlapSize = Physics.OverlapBoxNonAlloc(areaCenter,
-                                                             new Vector3(NormalProperties.SuckWidth, NormalProperties.SuckWidth,
-                                                                         NormalProperties.SuckDistance),
-                                                             suckOverlap, transform.rotation, NormalProperties.SuckMask);
-
-                for (var i = 0; i < suckOverlapSize; i++)
-                {
-                    if (suckOverlap[i].TryGetComponent(out Suckable suck))
-                    {
-                        suck.Suck(PlayerController.SuckLocation.position, ObjectInhaled);
-                    }
-                }
+                CheckSuckable();
+                UpdateSucking();
             }
         }
 
-        private void ObjectInhaled(SuckObject suckObject)
+        private void CheckSuckable()
+        {
+            Transform transform = Player.transform;
+            Vector3 origin = Player.SuckLocation.position;
+            Vector3 areaCenter = origin
+                               + transform.forward * (NormalProperties.SuckDistance / 2f);
+                
+            suckOverlapSize = Physics.OverlapBoxNonAlloc(areaCenter,
+                                                         new Vector3(NormalProperties.SuckWidth, NormalProperties.SuckWidth,
+                                                                     NormalProperties.SuckDistance),
+                                                         suckOverlap, transform.rotation, NormalProperties.SuckMask);
+
+            var currentlySucking = new List<ISuckable>(sucking);
+            for (var i = 0; i < suckOverlapSize; i++)
+            {
+                Debug.Log(suckOverlap[i].name);
+                if (suckOverlap[i].TryGetComponent(out ISuckable suckable))
+                {
+                    Debug.Log("Suckable");
+                    if (currentlySucking.Contains(suckable))
+                    {
+                        currentlySucking.Remove(suckable);
+                    }
+                    else
+                    {
+                        sucking.Add(suckable);
+                        suckable.EnterSucking();
+
+                        suckable.OnCompleteSucking += ObjectInhaled;
+                    }
+                }
+            }
+            
+            // what's left is what's no longer in the sucking area
+            foreach (ISuckable notSucking in currentlySucking)
+            {
+                notSucking.ExitSucking();
+                sucking.Remove(notSucking);
+            }
+        }
+
+        private void UpdateSucking()
+        {
+            foreach (ISuckable suckable in sucking)
+            {
+                suckable.UpdateSucking(Player.SuckLocation.position);
+            }
+        }
+
+        private void ObjectInhaled(AbilityType abilityType)
         {
             hasObject = true;
             FlyingLock = true;
             isSucking = false;
+            
+            Animator.SetBool(NormalProperties.InhaledParam, true);
 
-            this.suckObject = suckObject;
+            suckObject = NormalProperties.SuckObjects[abilityType];
             suckFx.SetActive(false);
+            
+            sucking.Clear();
         }
 
         public override void OnStartAction()
@@ -128,6 +167,7 @@ namespace PinkBlob.Gameplay.Ability
             {
                 isSucking = false;
                 suckFx.SetActive(false);
+                sucking.Clear();
             }
         }
 
@@ -138,7 +178,9 @@ namespace PinkBlob.Gameplay.Ability
                 hasObject = false;
                 FlyingLock = false;
 
-                Object.Instantiate(suckObject, PlayerController.SuckLocation.position, PlayerController.SuckLocation.rotation);
+                Animator.SetBool(NormalProperties.InhaledParam, false);
+
+                Object.Instantiate(suckObject, Player.SuckLocation.position, Player.SuckLocation.rotation);
             }
         }
 
@@ -153,7 +195,9 @@ namespace PinkBlob.Gameplay.Ability
         private void Swallow()
         {
             hasObject = false;
-            PlayerController.SetAbility(suckObject.AbilityType);
+            Animator.SetBool(NormalProperties.InhaledParam, false);
+            Animator.SetTrigger(NormalProperties.SwallowedTrigger);
+            Player.SetAbility(suckObject.AbilityType);
         }
 
         public override void PrintDebugWindow()
@@ -183,8 +227,8 @@ namespace PinkBlob.Gameplay.Ability
                 bool hasSuck = suckOverlapSize > 0;
                 Gizmos.color = hasSuck ? Color.green : Color.blue;
 
-                Vector3 origin = PlayerController.SuckLocation.position;
-                Transform transform = PlayerController.transform;
+                Vector3 origin = Player.SuckLocation.position;
+                Transform transform = Player.transform;
 
                 Vector3 forward = transform.forward;
                 Vector3 up = transform.up;

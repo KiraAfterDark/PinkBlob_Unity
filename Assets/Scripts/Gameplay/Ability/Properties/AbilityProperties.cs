@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace PinkBlob.Gameplay.Ability.Properties
 {
-    public class AbilityProperties : ScriptableObject
+    public class AbilityProperties : SerializedScriptableObject
     {
         [Title("Information")]
 

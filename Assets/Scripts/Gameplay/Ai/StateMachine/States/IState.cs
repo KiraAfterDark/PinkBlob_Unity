@@ -21,5 +21,7 @@ namespace PinkBlob
         bool CanTransitionOut();
 
         bool CanTransitionToSelf();
+
+        void PrintDebug();
     }
 }

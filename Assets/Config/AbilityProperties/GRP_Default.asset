@@ -12,5 +12,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34f9317315f0d10439f31638aa115ba0, type: 3}
   m_Name: GRP_Default
   m_EditorClassIdentifier: 
-  normalAbilityProperties: {fileID: 11400000, guid: 2f4bb0b2bda08fe4398f64ca8b8dea52, type: 2}
-  fireAbilityProperties: {fileID: 11400000, guid: d796f16362d65b241834d8649e09acad, type: 2}
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects:
+    - {fileID: 11400000, guid: 2f4bb0b2bda08fe4398f64ca8b8dea52, type: 2}
+    - {fileID: 11400000, guid: d796f16362d65b241834d8649e09acad, type: 2}
+    - {fileID: 11400000, guid: 511efaa29245d4d41a78d3f503001e38, type: 2}
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: NormalAbilityProperties
+      Entry: 10
+      Data: 0
+    - Name: FireAbilityProperties
+      Entry: 10
+      Data: 1
+    - Name: CutterAbilityProperties
+      Entry: 10
+      Data: 2
