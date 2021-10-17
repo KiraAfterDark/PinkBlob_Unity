@@ -4,13 +4,12 @@ using Pathfinding;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
 namespace PinkBlob.Gameplay.Ai.StateMachine.States.MoveStates
 {
     [RequireComponent(typeof(Seeker))]
-    [RequireComponent(typeof(CharacterController))]
+    [RequireComponent(typeof(Rigidbody))]
     public class WanderMoveState : MoveState
     {
         public override string StateName() => "Wander Move State";
@@ -60,7 +59,7 @@ namespace PinkBlob.Gameplay.Ai.StateMachine.States.MoveStates
         private Seeker seeker;
         private Path path;
         private bool reachedEndOfPath;
-        private CharacterController characterController;
+        private Rigidbody rigidbody;
         private int currentWaypoint = 0;
         private float distanceToWaypoint;
         private bool hasPath = false;
@@ -71,7 +70,7 @@ namespace PinkBlob.Gameplay.Ai.StateMachine.States.MoveStates
         private void Awake()
         {
             seeker = GetComponent<Seeker>();
-            characterController = GetComponent<CharacterController>();
+            rigidbody= GetComponent<Rigidbody>();
 
             startPosition = transform.position;
             
@@ -237,10 +236,11 @@ namespace PinkBlob.Gameplay.Ai.StateMachine.States.MoveStates
                     break;
                 }
             }
-            
-            Vector3 dir = (path.vectorPath[currentWaypoint] - transform.position).normalized;
-            Vector3 velocity = dir * movementSpeed;
-            characterController.SimpleMove(velocity);
+
+            Vector3 position = transform.position;
+            Vector3 dir = (path.vectorPath[currentWaypoint] - position).normalized;
+            Vector3 velocity = dir * (movementSpeed * Time.deltaTime);
+            rigidbody.MovePosition(position + velocity);
 
             UpdateRotation(velocity.normalized);
         }
@@ -315,8 +315,9 @@ namespace PinkBlob.Gameplay.Ai.StateMachine.States.MoveStates
                 EditorGUILayout.LabelField($"Start Position: {path.vectorPath[0]}");
                 EditorGUILayout.LabelField($"End Position: {path.vectorPath[^1]}");
 
-                EditorGUILayout.LabelField($"Position: {transform.position}");
-                EditorGUILayout.LabelField($"Distance to end: {Vector3.Distance(transform.position, path.vectorPath[^1])}");
+                Vector3 position = transform.position;
+                EditorGUILayout.LabelField($"Position: {position}");
+                EditorGUILayout.LabelField($"Distance to end: {Vector3.Distance(position, path.vectorPath[^1])}");
             }
         }
 

@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using PinkBlob.Gameplay.Enemy;
 using UnityEngine;
 
 namespace PinkBlob.Gameplay.Ai.StateMachine
 {
+    [RequireComponent(typeof(EnemyController))]
     public abstract class StateMachine : MonoBehaviour
     {
         public IState CurrentState => currentState;
@@ -11,8 +13,13 @@ namespace PinkBlob.Gameplay.Ai.StateMachine
         public List<Transition> Transitions => transitions;
         private readonly List<Transition> transitions = new List<Transition>();
 
+        protected EnemyController EnemyController => enemyController; 
+        private EnemyController enemyController;
+
         private void Awake()
         {
+            enemyController = GetComponent<EnemyController>();
+            
             InitStateMachine();
         }
 

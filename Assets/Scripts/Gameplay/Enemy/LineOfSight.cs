@@ -58,6 +58,9 @@ namespace PinkBlob.Gameplay.Enemy
             Gizmos.color = Color.red;
             Gizmos.DrawLine(pos, pos + leftForward * sightRange);
             Gizmos.DrawLine(pos, pos + rightForward * sightRange);
+            
+            Gizmos.color = Color.blue;
+            Gizmos.DrawSphere(pos, 0.1f);
         }
         
         #region Debugging

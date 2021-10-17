@@ -103,10 +103,8 @@ namespace PinkBlob.Gameplay.Ability
             var currentlySucking = new List<ISuckable>(sucking);
             for (var i = 0; i < suckOverlapSize; i++)
             {
-                Debug.Log(suckOverlap[i].name);
                 if (suckOverlap[i].TryGetComponent(out ISuckable suckable))
                 {
-                    Debug.Log("Suckable");
                     if (currentlySucking.Contains(suckable))
                     {
                         currentlySucking.Remove(suckable);
@@ -116,7 +114,7 @@ namespace PinkBlob.Gameplay.Ability
                         sucking.Add(suckable);
                         suckable.EnterSucking();
 
-                        suckable.OnCompleteSucking += ObjectInhaled;
+                        suckable.CompleteSucking += ObjectInhaled;
                     }
                 }
             }

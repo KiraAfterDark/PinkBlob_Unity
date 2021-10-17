@@ -8,6 +8,8 @@ namespace PinkBlob.Gameplay.Ability.Objects
 {
     public class CutterObject : MonoBehaviour
     {
+        public event Action<CutterObject> CutterDeath;
+        
         private bool isInit = false;
         
         [Title("Movement")]
@@ -113,6 +115,7 @@ namespace PinkBlob.Gameplay.Ability.Objects
                 health.DealDamage(damage);
             }
             
+            CutterDeath?.Invoke(this);
             Destroy(gameObject);
         }
 

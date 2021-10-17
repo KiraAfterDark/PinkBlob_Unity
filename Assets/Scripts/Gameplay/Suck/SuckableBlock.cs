@@ -10,8 +10,8 @@ namespace PinkBlob.Gameplay.Suck
 {
     public class SuckableBlock : MonoBehaviour, ISuckable
     {
-        public event Action<AbilityType> OnCompleteSucking;
-        
+        public event Action<AbilityType> CompleteSucking;
+
         private const float SuckTime = 0.2f;
 
         private float suckTimer = 0;
@@ -41,11 +41,11 @@ namespace PinkBlob.Gameplay.Suck
 
         [Min(0)]
         [SerializeField]
-        private float intensity = 1f;
+        private float intensity = 0.1f;
 
         [Min(0)]
         [SerializeField]
-        private float speed = 1f;
+        private float speed = 10f;
 
         private Vector3 shakeSeed;
 
@@ -53,6 +53,8 @@ namespace PinkBlob.Gameplay.Suck
 
         [SerializeField]
         private List<Collider> colliders = new List<Collider>();
+
+        private bool isSucking;
 
         private void Awake()
         {
@@ -62,6 +64,7 @@ namespace PinkBlob.Gameplay.Suck
 
         public void EnterSucking()
         {
+            isSucking = true;
             currentSuckHealth = suckHealth;
             visual.localPosition = Vector3.zero;
         }
@@ -90,18 +93,19 @@ namespace PinkBlob.Gameplay.Suck
 
                 if (currentSuckHealth <= 0)
                 {
-                    CompleteSucking(source);
+                    CompleteSuck(source);
                 }
             }
         }
 
         public void ExitSucking()
         {
+            isSucking = false;
             currentSuckHealth = suckHealth;
             visual.localPosition = Vector3.zero;
         }
 
-        private void CompleteSucking(Vector3 destination)
+        private void CompleteSuck(Vector3 destination)
         {
             isInhaled = true;
 
@@ -114,9 +118,16 @@ namespace PinkBlob.Gameplay.Suck
                      .SetEase(inhaleEase)
                      .OnComplete(() =>
                                  {
-                                     OnCompleteSucking?.Invoke(abilityType);
+                                     CompleteSucking?.Invoke(abilityType);
                                      Destroy(gameObject);
                                  });
+            
+            transform.DOScale(Vector3.one * 0.1f, inhaleTime).SetEase(inhaleEase);
+        }
+
+        public bool IsSucking()
+        {
+            return isSucking;
         }
     }
 }

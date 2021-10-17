@@ -1,5 +1,7 @@
 using PinkBlob.Gameplay;
+using PinkBlob.Gameplay.Ai.StateMachine;
 using PinkBlob.Gameplay.Enemy;
+using PinkBlob.Gameplay.Suck;
 using UnityEditor;
 using UnityEngine;
 
@@ -31,7 +33,12 @@ namespace PinkBlob.Editor
                 if (Selection.activeGameObject && Selection.activeGameObject.TryGetComponent(out EnemyController enemy))
                 {
                     GUILayout.Label($"{enemy.name}");
-                    
+
+                    if (enemy is ISuckable suckable)
+                    {
+                        GUILayout.Label($"Is being sucked: {suckable.IsSucking()}");
+                    }
+
                     stateMachineFold = EditorGUILayout.Foldout(stateMachineFold, "State Machine", true);
                     if (stateMachineFold)
                     {

@@ -1,18 +1,15 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
-namespace PinkBlob
+namespace PinkBlob.Gameplay.Ai.StateMachine
 {
     public class Transition
     {
         public IState FromState { get; private set; }
         public IState ToState { get; private set; }
-        
-        public bool Interrupt { get; private set; }
 
-        public List<Func<bool>> ExtraCheck => extraChecks;
+        private bool interrupt;
+
         private readonly List<Func<bool>> extraChecks = new List<Func<bool>>();
 
         public Transition From(IState state)
@@ -35,12 +32,17 @@ namespace PinkBlob
 
         public Transition IsInterrupt()
         {
-            Interrupt = true;
+            interrupt = true;
             return this;
         }
 
         public bool CanTransition()
         {
+            if (interrupt)
+            {
+                return ToState.CanTransitionIn() && ExtraChecks() && CheckSelfTransition();
+            }
+            
             return FromState.CanTransitionOut() && ToState.CanTransitionIn() && ExtraChecks() && CheckSelfTransition();
         }
 

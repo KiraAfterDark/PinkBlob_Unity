@@ -24,5 +24,7 @@ MonoBehaviour:
   nameKey: ability_name_cutter
   material: {fileID: 2100000, guid: f47242d1f686f5243bb46e54498eeb3a, type: 2}
   prefab: {fileID: 6067760876550154352, guid: a21f6feaae1f4f245a319a883aaf1a84, type: 3}
-  forwardDistance: 5
-  sideDistance: 1
+  damage: 5
+  maxCutters: 3
+  cooldown: 0.5
+  cutterTrigger: Cutter

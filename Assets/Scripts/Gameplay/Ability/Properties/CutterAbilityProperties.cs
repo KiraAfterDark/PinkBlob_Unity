@@ -1,3 +1,4 @@
+using System.Transactions;
 using PinkBlob.Gameplay.Ability.Objects;
 using PinkBlob.Gameplay.Player;
 using Sirenix.OdinInspector;
@@ -27,5 +28,18 @@ namespace PinkBlob.Gameplay.Ability.Properties
         private int maxCutters = 3;
 
         public int MaxCutters => maxCutters;
+
+        [Min(0)]
+        [SerializeField]
+        private float cooldown = 0.25f;
+        
+        public float Cooldown => cooldown;
+
+        [Title("Animation")]
+
+        [SerializeField]
+        private string cutterTrigger = "Cutter";
+
+        public string CutterTrigger => cutterTrigger;
     }
 }

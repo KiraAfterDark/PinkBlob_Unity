@@ -1,3 +1,4 @@
+using PinkBlob.Gameplay.Ai.StateMachine.States.StunStates;
 using PinkBlob.Gameplay.Enemy;
 using PinkBlob.Gameplay.Player;
 using Sirenix.OdinInspector;
@@ -23,6 +24,9 @@ namespace PinkBlob.Gameplay.Ai.StateMachine.EnemyStateMachines
         [SerializeField]
         private MoveState track;
 
+        [SerializeField]
+        private StunState inhaleStun;
+
         [Tooltip("When player is in this range, enemy will track player")]
         [Min(0)]
         [SerializeField]
@@ -37,6 +41,10 @@ namespace PinkBlob.Gameplay.Ai.StateMachine.EnemyStateMachines
             From(track).To(track);
             From(track).To(wander).When(() => !CheckDistanceToPlayer(trackingRange)
                                            || !lineOfSight.HasLineOfSight(player));
+
+            From(track).To(inhaleStun).IsInterrupt().When(() => EnemyController.IsSucking());
+            From(inhaleStun).To(wander).When(() => !EnemyController.IsSucking());
+            
         }
 
         protected override void OnStart()

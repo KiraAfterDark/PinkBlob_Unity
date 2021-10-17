@@ -83,6 +83,7 @@ namespace PinkBlob.Gameplay
 			Stage = stage;
 
 			PlayerController = Instantiate(playerControllerPrefab, Vector3.zero, Quaternion.identity);
+			PlayerController.transform.position = Stage.PlayerSpawn.position;
 			abilityHud.Init(PlayerController);
 		}
 

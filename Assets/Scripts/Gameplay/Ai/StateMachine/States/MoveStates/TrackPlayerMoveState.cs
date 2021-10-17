@@ -7,7 +7,7 @@ using UnityEngine;
 namespace PinkBlob.Gameplay.Ai.StateMachine.States.MoveStates
 {
     [RequireComponent(typeof(Seeker))]
-    [RequireComponent(typeof(CharacterController))]
+    [RequireComponent(typeof(Rigidbody))]
     public class TrackPlayerMoveState : MoveState
     {
         public override string StateName() => "Tracking Player Move State";
@@ -42,14 +42,14 @@ namespace PinkBlob.Gameplay.Ai.StateMachine.States.MoveStates
         private Seeker seeker;
         private Path path;
         private bool reachedEndOfPath;
-        private CharacterController characterController;
+        private Rigidbody rigidbody;
         private int currentWaypoint = 0;
         private float distanceToWaypoint;
 
         private void Awake()
         {
             seeker = GetComponent<Seeker>();
-            characterController = GetComponent<CharacterController>();
+            rigidbody = GetComponent<Rigidbody>();
 
             SetupSubStateMap();
         }
@@ -200,10 +200,11 @@ namespace PinkBlob.Gameplay.Ai.StateMachine.States.MoveStates
                     break;
                 }
             }
-            
-            Vector3 dir = (path.vectorPath[currentWaypoint] - transform.position).normalized;
-            Vector3 velocity = dir * movementSpeed;
-            characterController.SimpleMove(velocity);
+
+            Vector3 position = transform.position;
+            Vector3 dir = (path.vectorPath[currentWaypoint] - position).normalized;
+            Vector3 velocity = dir * (movementSpeed * Time.deltaTime);
+            rigidbody.MovePosition(position + velocity);
 
             UpdateRotation(velocity.normalized);
         }
