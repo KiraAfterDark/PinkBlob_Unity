@@ -10,6 +10,8 @@ namespace PinkBlob.Gameplay.Ability.Objects
     {
         private bool isInit = false;
         
+        [Title("Movement")]
+        
         [SerializeField]
         private float speed = 15f;
 
@@ -22,10 +24,14 @@ namespace PinkBlob.Gameplay.Ability.Objects
         [SerializeField]
         private float rotationSpeed = 20;
 
+        [Title("Visuals")]
+        
         [Required]
         [SerializeField]
         private Transform visual;
 
+        [Title("Hit")]
+        
         [SerializeField]
         private Vector3 halfExtends = Vector3.one;
 
@@ -37,14 +43,16 @@ namespace PinkBlob.Gameplay.Ability.Objects
         
         private Vector3 moveVector;
 
-        [SerializeField]
-        private float debugDistance = 1f;
-
         [Min(0)]
         [SerializeField]
         private float spawnerHitDelay = 0.2f;
 
         private int damage;
+        
+        [Title("Debug")]
+        
+        [SerializeField]
+        private float debugDistance = 1f;
 
         public void Init(GameObject spawner, Vector3 velocity, int damage)
         {

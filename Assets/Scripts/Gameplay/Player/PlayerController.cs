@@ -180,7 +180,7 @@ namespace PinkBlob.Gameplay.Player
 
         [Required]
         [SerializeField]
-        private GameObject slideTrigger;
+        private Collider slideTrigger;
 
         [Title("Colliders")]
 
@@ -269,7 +269,7 @@ namespace PinkBlob.Gameplay.Player
             
             characterController.detectCollisions = true;
             
-            slideTrigger.SetActive(false);
+            slideTrigger.enabled = false;
             
             InitInput();
         }
@@ -607,12 +607,12 @@ namespace PinkBlob.Gameplay.Player
             isSlide = true;
             Vector3 slideVelocity = transform.forward * slideSpeed;
             velocity = slideVelocity;
-            slideTrigger.SetActive(true);
+            slideTrigger.enabled = true;
             
             yield return new WaitForSeconds(slideTimer);
 
             isSlide = false;
-            slideTrigger.SetActive(false);
+            slideTrigger.enabled = false;
             if (!playerInput.Gameplay.Crouch.inProgress)
             {
                 isCrouched = false;
@@ -639,8 +639,6 @@ namespace PinkBlob.Gameplay.Player
 
         private void OnTriggerEnter(Collider other)
         {
-            Debug.Log("Trigger");
-            
             if (isSlide)
             {
                 OnSlideTriggerEnter(other);
