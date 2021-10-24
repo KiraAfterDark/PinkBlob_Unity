@@ -11,6 +11,11 @@ namespace PinkBlob.Gameplay.Ability.Properties
         private string nameKey = "";
 
         public string NameKey => nameKey;
+
+        [SerializeField]
+        private Sprite icon;
+        
+        public Sprite Icon => icon;
         
         [Title("Visuals")]
 
