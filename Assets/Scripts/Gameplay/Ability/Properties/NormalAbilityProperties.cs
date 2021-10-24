@@ -45,9 +45,9 @@ namespace PinkBlob.Gameplay.Ability.Properties
         public GameObject SuckFx => suckFx;
 
         [SerializeField]
-        private Dictionary<AbilityType, SuckObject> suckObjects;
+        private SuckObject suckObject;
         
-        public Dictionary<AbilityType, SuckObject> SuckObjects => suckObjects;
+        public SuckObject SuckObject => suckObject;
         
         [Title("Inhaled")]
 

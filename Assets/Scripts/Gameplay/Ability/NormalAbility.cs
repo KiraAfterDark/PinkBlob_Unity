@@ -22,6 +22,7 @@ namespace PinkBlob.Gameplay.Ability
 
         private bool hasObject = false;
         private SuckObject suckObject;
+        private AbilityType suckType;
         private SuckObjectProperties suckObjectProperties;
 
         private readonly List<ISuckable> sucking = new List<ISuckable>();
@@ -143,7 +144,8 @@ namespace PinkBlob.Gameplay.Ability
             
             Animator.SetBool(NormalProperties.InhaledParam, true);
 
-            suckObject = NormalProperties.SuckObjects[abilityType];
+            suckObject = NormalProperties.SuckObject;
+            suckType = abilityType;
             suckFx.SetActive(false);
             
             sucking.Clear();
@@ -178,7 +180,8 @@ namespace PinkBlob.Gameplay.Ability
 
                 Animator.SetBool(NormalProperties.InhaledParam, false);
 
-                Object.Instantiate(suckObject, Player.SuckLocation.position, Player.SuckLocation.rotation);
+                SuckObject suckObj = Object.Instantiate(suckObject, Player.SuckLocation.position, Player.SuckLocation.rotation);
+                suckObj.Init(suckType);
             }
         }
 
@@ -195,7 +198,7 @@ namespace PinkBlob.Gameplay.Ability
             hasObject = false;
             Animator.SetBool(NormalProperties.InhaledParam, false);
             Animator.SetTrigger(NormalProperties.SwallowedTrigger);
-            Player.SetAbility(suckObject.AbilityType);
+            Player.SetAbility(suckType);
         }
 
         public override void PrintDebugWindow()

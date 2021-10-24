@@ -22,6 +22,7 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   nameKey: ability_name_cutter
+  icon: {fileID: 21300000, guid: 08c8f6816899c6049a0b1ab27162f11d, type: 3}
   material: {fileID: 2100000, guid: f47242d1f686f5243bb46e54498eeb3a, type: 2}
   prefab: {fileID: 6067760876550154352, guid: a21f6feaae1f4f245a319a883aaf1a84, type: 3}
   damage: 5

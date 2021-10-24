@@ -12,7 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c364b80cbb904a44ad925591ad19e84, type: 3}
   m_Name: ABL_Default_Fire_PROP
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
   nameKey: ability_name_fire
+  icon: {fileID: 21300000, guid: ab07d7032169b464e9f376568fb34e15, type: 3}
   material: {fileID: 2100000, guid: b0922950eb8f61b4ca220bd5debe674f, type: 2}
   damage: 2
   flamethrowerDistance: 2

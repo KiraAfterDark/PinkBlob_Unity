@@ -15,66 +15,14 @@ MonoBehaviour:
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
-    ReferencedUnityObjects:
-    - {fileID: 7706654636252494941, guid: 443675213e0bd6e40890eeb196dbb80c, type: 3}
-    - {fileID: 7706654636252494941, guid: 03e92ae33d4c4354a88e403c4217f107, type: 3}
+    ReferencedUnityObjects: []
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
-    SerializationNodes:
-    - Name: suckObjects
-      Entry: 7
-      Data: 0|System.Collections.Generic.Dictionary`2[[PinkBlob.Gameplay.Ability.AbilityType,
-        Assembly-CSharp],[PinkBlob.Gameplay.Player.SuckObject, Assembly-CSharp]],
-        mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 1|System.Collections.Generic.EnumEqualityComparer`1[[PinkBlob.Gameplay.Ability.AbilityType,
-        Assembly-CSharp]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 2
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 0
-    - Name: $v
-      Entry: 10
-      Data: 0
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 1
-    - Name: $v
-      Entry: 10
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+    SerializationNodes: []
   nameKey: ability_name_normal
+  icon: {fileID: 21300000, guid: 47cfa66d1c558c649941f53a637eabd9, type: 3}
   material: {fileID: 2100000, guid: 9a31a297e1a3d7f40bcf74792f908479, type: 2}
   suckDistance: 2
   suckWidth: 0.5
@@ -83,7 +31,9 @@ MonoBehaviour:
   suckMask:
     serializedVersion: 2
     m_Bits: 9472
-  suckTime: 0.5
   suckFx: {fileID: 2436199281317572666, guid: 94434cf89300db048bf34119cb894c3e, type: 3}
+  suckObject: {fileID: 0}
   inhaledRotationSpeedMod: 0.25
   inhaledAccelMod: 0.25
+  inhaledParam: Inhaled
+  swallowedTrigger: Swallowed

@@ -23,14 +23,16 @@ namespace PinkBlob.Gameplay.Player
         [SerializeField]
         private LayerMask layerMask = default;
 
-        [Title("Ability")]
+        // Ability
 
-        [SerializeField]
-        private AbilityType abilityType = AbilityType.Normal;
-
-        public AbilityType AbilityType => abilityType;
+        public AbilityType AbilityType { get; private set; }
 
         private bool hasHit;
+
+        public void Init(AbilityType abilityType)
+        {
+            AbilityType = abilityType;
+        }
 
         private void Update()
         {
