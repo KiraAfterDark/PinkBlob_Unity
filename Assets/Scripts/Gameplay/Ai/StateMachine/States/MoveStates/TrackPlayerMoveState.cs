@@ -262,8 +262,10 @@ namespace PinkBlob.Gameplay.Ai.StateMachine.States.MoveStates
             public const int Finish = 4;
         }
 
-        public override void PrintDebug()
+        public override string Print()
         {
+            return "";
+
             // EditorGUILayout.LabelField($"Current Sub State: {CurrentSubState.Name}");
             //
             // EditorGUILayout.Space(5);

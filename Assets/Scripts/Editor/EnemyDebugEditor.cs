@@ -51,7 +51,7 @@ namespace PinkBlob.Editor
                     if (stateFold)
                     {
                         EditorGUI.indentLevel++;
-                        enemy.StateMachine.CurrentState.PrintDebug();
+                        GUILayout.Label(enemy.StateMachine.CurrentState.Print());
                         EditorGUI.indentLevel--;
                     }
 

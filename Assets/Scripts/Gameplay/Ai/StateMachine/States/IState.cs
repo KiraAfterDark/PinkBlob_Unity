@@ -1,9 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace PinkBlob
+namespace PinkBlob.Gameplay.Ai.StateMachine.States
 {
     public interface IState
     {
@@ -22,6 +17,6 @@ namespace PinkBlob
 
         bool CanTransitionToSelf();
 
-        void PrintDebug();
+        string Print();
     }
 }

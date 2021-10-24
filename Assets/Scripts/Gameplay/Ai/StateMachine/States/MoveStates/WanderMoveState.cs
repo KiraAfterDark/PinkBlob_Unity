@@ -298,27 +298,25 @@ namespace PinkBlob.Gameplay.Ai.StateMachine.States.MoveStates
             public const int Finish = 4;
         }
 
-        public override void PrintDebug()
+        public override string Print()
         {
-            EditorGUILayout.LabelField($"Current Sub State: {CurrentSubState.Name}");
+            var s = $"Current Sub State: {CurrentSubState.Name}\n";
 
             if (hasPath)
             {
-                EditorGUILayout.Space(5);
+                s += $"Number of waypoints: {path.vectorPath.Count}\n";
+                s += $"Current waypoint: {currentWaypoint}\n";
+                s += $"Distance to waypoint: {distanceToWaypoint}\n\n";
 
-                EditorGUILayout.LabelField($"Number of waypoints: {path.vectorPath.Count}");
-                EditorGUILayout.LabelField($"Current waypoint: {currentWaypoint}");
-                EditorGUILayout.LabelField($"Distance to waypoint: {distanceToWaypoint}");
-
-                EditorGUILayout.Space(5);
-
-                EditorGUILayout.LabelField($"Start Position: {path.vectorPath[0]}");
-                EditorGUILayout.LabelField($"End Position: {path.vectorPath[^1]}");
+                s += $"Start Position: {path.vectorPath[0]}\n";
+                s += $"End Position: {path.vectorPath[path.vectorPath.Count - 1]}\n";
 
                 Vector3 position = transform.position;
-                EditorGUILayout.LabelField($"Position: {position}");
-                EditorGUILayout.LabelField($"Distance to end: {Vector3.Distance(position, path.vectorPath[^1])}");
+                s += $"Position: {position}\n";
+                s += $"Distance to end: {Vector3.Distance(position, path.vectorPath[path.vectorPath.Count - 1])}\n";
             }
+
+            return s;
         }
 
         private void OnDrawGizmos()

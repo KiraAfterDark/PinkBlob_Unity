@@ -15,6 +15,6 @@ namespace PinkBlob.Gameplay.Ai.StateMachine.States.StunStates
         public bool CanTransitionIn() => true;
         public bool CanTransitionOut() => true;
         public bool CanTransitionToSelf() => false;
-        public void PrintDebug() { }
+        public string Print() { return ""; }
     }
 }

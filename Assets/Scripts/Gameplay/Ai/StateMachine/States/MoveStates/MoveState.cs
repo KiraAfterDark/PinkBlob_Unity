@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
-using UnityEditor;
 using UnityEngine;
 
-namespace PinkBlob
+namespace PinkBlob.Gameplay.Ai.StateMachine.States.MoveStates
 {
     public abstract class MoveState : MonoBehaviour, IState
     {
@@ -51,7 +49,7 @@ namespace PinkBlob
 
         public virtual bool CanTransitionToSelf() => false;
 
-        public abstract void PrintDebug();
+        public abstract string Print();
 
         protected void SetSubState(int subStateId)
         {

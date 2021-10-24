@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using PinkBlob.Gameplay.Ability.Properties;
 using PinkBlob.Gameplay.Enemy;
 using PinkBlob.Gameplay.Player;
-using PinkBlob.Ui.GameplayHud;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -46,13 +45,6 @@ namespace PinkBlob.Gameplay
 		
 		public StageController Stage { get; private set; }
 
-		[Title("Hud")]
-
-		[Required]
-		[SceneObjectsOnly]
-		[SerializeField]
-		private AbilityHud abilityHud;
-		
 		// Enemies
 		public List<EnemyController> Enemies => enemies;
 		private List<EnemyController> enemies = new List<EnemyController>();
@@ -84,7 +76,6 @@ namespace PinkBlob.Gameplay
 
 			PlayerController = Instantiate(playerControllerPrefab, Vector3.zero, Quaternion.identity);
 			PlayerController.transform.position = Stage.PlayerSpawn.position;
-			abilityHud.Init(PlayerController);
 		}
 
 		public void SpawnEnemy(EnemyController enemy)
