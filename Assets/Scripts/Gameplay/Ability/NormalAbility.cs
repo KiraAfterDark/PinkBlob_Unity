@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using FMOD.Studio;
 using PinkBlob.Gameplay.Ability.Properties;
 using PinkBlob.Gameplay.Player;
 using PinkBlob.Gameplay.Suck;
@@ -65,6 +66,9 @@ namespace PinkBlob.Gameplay.Ability
         
         private readonly GameObject suckFx;
         
+        // Audio
+        private EventInstance inhaleFmod;
+
         public NormalAbility(PlayerController player, Animator animator) : base(player, animator)
         {
             Properties = GameplayController.Instance.AbilityPropertyGroup.NormalAbilityProperties;
@@ -73,6 +77,8 @@ namespace PinkBlob.Gameplay.Ability
 
             suckFx = Object.Instantiate(NormalProperties.SuckFx, player.SuckLocation);
             suckFx.SetActive(false);
+
+            inhaleFmod = FMODUnity.RuntimeManager.CreateInstance("event:/Sfx/Kirby/Inhale");
         }
 
         protected override void ExitAbility()
@@ -141,7 +147,7 @@ namespace PinkBlob.Gameplay.Ability
             hasObject = true;
             FlyingLock = true;
             isSucking = false;
-            
+
             Animator.SetBool(NormalProperties.InhaledParam, true);
 
             suckObject = NormalProperties.SuckObject;
@@ -149,6 +155,8 @@ namespace PinkBlob.Gameplay.Ability
             suckFx.SetActive(false);
             
             sucking.Clear();
+
+            inhaleFmod.stop(STOP_MODE.ALLOWFADEOUT);
         }
 
         public override void OnStartAction()
@@ -158,6 +166,8 @@ namespace PinkBlob.Gameplay.Ability
                 isSucking = true;
 
                 suckFx.SetActive(true);
+
+                inhaleFmod.start();
             }
         }
 
@@ -168,6 +178,8 @@ namespace PinkBlob.Gameplay.Ability
                 isSucking = false;
                 suckFx.SetActive(false);
                 sucking.Clear();
+
+                inhaleFmod.stop(STOP_MODE.ALLOWFADEOUT);
             }
         }
 

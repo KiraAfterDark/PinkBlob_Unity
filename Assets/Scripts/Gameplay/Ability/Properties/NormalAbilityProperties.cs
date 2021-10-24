@@ -72,5 +72,12 @@ namespace PinkBlob.Gameplay.Ability.Properties
         private string swallowedTrigger = "Swallowed";
 
         public string SwallowedTrigger => swallowedTrigger;
+
+        [Title("Audio")]
+
+        [SerializeField]
+        private FMOD.Studio.EventDescription inhaleFmod;
+        
+        public FMOD.Studio.EventDescription InhaleFmod => InhaleFmod;
     }
 }
